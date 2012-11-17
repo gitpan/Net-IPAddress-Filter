@@ -23,11 +23,12 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Net::IPAddress::Filter",
   "PREREQ_PM" => {
+    "Net::CIDR::Lite" => 0,
     "Set::IntervalTree" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => 20121112,
+  "VERSION" => 20121117,
   "test" => {
     "TESTS" => "t/*.t"
   }

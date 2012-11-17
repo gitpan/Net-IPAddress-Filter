@@ -28,6 +28,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Net::CIDR::Lite" : "0",
             "Set::IntervalTree" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -52,6 +53,6 @@
          "web" : "https://github.com/d5ve/p5-Net-IPAddress-Filter"
       }
    },
-   "version" : "20121112"
+   "version" : "20121117"
 }
 
