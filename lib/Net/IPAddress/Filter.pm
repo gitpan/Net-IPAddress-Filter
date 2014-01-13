@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: A compact and fast IP Address range filter
-our $VERSION = '20121117'; # VERSION
+our $VERSION = '20140113'; # VERSION
 
 
 use Net::CIDR::Lite;
@@ -27,9 +27,14 @@ sub add_range {
 
     my ($start_num, $end_num) = _get_start_and_end_numbers($start_ip, $end_ip);
 
-    # Set::IntervalTree uses half-closed intervals, so need to go 1 higher and
-    # lower than the actual ranges.
-    $self->{filter}->insert($start_ip . ($end_ip ? ",$end_ip" : ''), $start_num - 1, $end_num + 1 );
+    # Different versions of Set::IntervalTree use different-closed intervals,
+    # so need to allow for that.
+    if ( $Set::IntervalTree::VERSION < 0.08 ) {
+        $self->{filter}->insert($start_ip . ($end_ip ? ",$end_ip" : ''), $start_num - 1, $end_num + 1 );
+    }
+    else {
+        $self->{filter}->insert($start_ip . ($end_ip ? ",$end_ip" : ''), $start_num, $end_num + 1 );
+    }
 
     return 1;
 }
@@ -40,9 +45,14 @@ sub add_range_with_value {
 
     my ($start_num, $end_num) = _get_start_and_end_numbers($start_ip, $end_ip);
 
-    # Set::IntervalTree uses half-closed intervals, so need to go 1 higher and
-    # lower than the actual ranges.
-    $self->{filter}->insert($value, $start_num - 1, $end_num + 1 );
+    # Different versions of Set::IntervalTree use different-closed intervals,
+    # so need to allow for that.
+    if ( $Set::IntervalTree::VERSION < 0.08 ) {
+        $self->{filter}->insert( $value, $start_num - 1, $end_num + 1 );
+    }
+    else {
+        $self->{filter}->insert( $value, $start_num, $end_num + 1 );
+    }
 
     return 1;
 }
@@ -52,8 +62,9 @@ sub in_filter {
     my ( $self, $test_ip ) = @_;
 
     my $test_num = _ip_address_to_number($test_ip);
+    my $end_num  = $Set::IntervalTree::VERSION < 0.08 ? $test_num : $test_num + 1;
 
-    my $found = $self->{filter}->fetch( $test_num, $test_num ) || return 0;
+    my $found = $self->{filter}->fetch( $test_num, $end_num ) || return 0;
 
     return scalar @$found;
 }
@@ -63,8 +74,9 @@ sub get_matches {
     my ( $self, $test_ip ) = @_;
 
     my $test_num = _ip_address_to_number($test_ip);
+    my $end_num  = $Set::IntervalTree::VERSION < 0.08 ? $test_num : $test_num + 1;
 
-    return $self->{filter}->fetch( $test_num, $test_num );
+    return $self->{filter}->fetch( $test_num, $end_num );
 
 }
 
@@ -112,7 +124,7 @@ Net::IPAddress::Filter - A compact and fast IP Address range filter
 
 =head1 VERSION
 
-version 20121117
+version 20140113
 
 =head1 SYNOPSIS
 
@@ -311,7 +323,7 @@ Dave Webb <Net-IPAddress-Filter@d5ve.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Dave Webb.
+This software is copyright (c) 2014 by Dave Webb.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

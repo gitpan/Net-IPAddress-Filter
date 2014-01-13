@@ -22,4 +22,4 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-IPAddress-Filter
   repository: https://github.com/d5ve/p5-Net-IPAddress-Filter.git
-version: 20121117
+version: 20140113
